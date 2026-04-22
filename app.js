@@ -4,6 +4,28 @@ const port = 3000
 
 app.use(express.json());
 
+
+const morgan = require('morgan');
+const helmet = require('helmet');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 requests per windowMs
+  message: { error: 'Too many requests, please try again after 15 minutes' }
+});
+
+app.use(cors());
+app.use(morgan('dev'));
+app.use(helmet());
+app.use(limiter);
+app.use(compression());
+
+
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
