@@ -59,7 +59,7 @@ app.get('/api', (req, res) => {
 });
 
 
-function getRecipes(req, res, next) {
+function getRecipe(req, res, next) {
   const auth_key = req.headers['x-vault-key'];
   if (auth_key == '12345') {
     next();
@@ -68,7 +68,7 @@ function getRecipes(req, res, next) {
   }
 }
 
-app.post('/api', getRecipes, (req, res) => {
+app.post('/api', getRecipe, (req, res) => {
   const { food, ingredients } = req.body;
 
   const newRecipe = { id: recipes.length + 1, food, ingredients };
