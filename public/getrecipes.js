@@ -2,7 +2,7 @@ let allRecipes = [];
 
 async function fetchRecipes() {
     try {
-        const response = await fetch('/api');
+        const response = await fetch('/recipes/get');
         allRecipes = await response.json();
         displayRecipes(allRecipes);
     } catch (error) {
@@ -41,7 +41,7 @@ async function saveRecipe(event) {
     const food = document.getElementById('food').value;
     const ingredients = document.getElementById('ingredients').value;
     try {
-        const response = await fetch('/api', {
+        const response = await fetch('/recipes/post', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ async function saveRecipe(event) {
 
 async function deleteRecipe(id) {
     try {
-        const response = await fetch(`/api/${id}`, {
+        const response = await fetch(`/recipes/delete/${id}`, {
             method: 'DELETE',
             headers: {
                 'x-vault-key': '12345'

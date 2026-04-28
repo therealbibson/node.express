@@ -5,6 +5,9 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 
+const userRouter = require('./routes/user.route')
+const recipesRouter = require('./routes/recipes.route');
+
 
 const app = express()
 const port = 3000
@@ -20,13 +23,20 @@ const limiter = rateLimit({
 });
 
 app.use(express.static('public'));
-app.use(cors());
-app.use(morgan('dev'));
-app.use(helmet());
-app.use(limiter);
-app.use(compression());
+// app.use(cors());
+// app.use(morgan('dev'));
+// app.use(helmet());
+// app.use(limiter);
+// app.use(compression());
 
 
+app.use('/users', userRouter.userRouter);
+app.use('/recipes', recipesRouter)
+
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
 
 // app.get('/', (req, res) => {
 //   res.send('Hello World!')
@@ -43,68 +53,3 @@ app.use(compression());
 // app.patch('/', (req, res) => {
 //   res.send('Hello World!')
 // })
-
-
-
-
-let recipes = [
-  { id: 1, food: 'Rice', ingredients: 'rice, water, salt' },
-  { id: 2, food: 'Beans', ingredients: 'beans, water, salt, red oil' },
-  { id: 3, food: 'Eggs', ingredients: 'eggs, water, salt' },
-  { id: 4, food: 'Potatoes', ingredients: 'potatoes, water, salt' },
-];
-
-app.get('/api', (req, res) => {
-  res.json(recipes);
-});
-
-
-function getRecipe(req, res, next) {
-  const auth_key = req.headers['x-vault-key'];
-  if (auth_key == '12345') {
-    next();
-  } else {
-    res.status(401).json({ error: 'Unauthorized' });
-  }
-}
-
-app.post('/api', getRecipe, (req, res) => {
-  const { food, ingredients } = req.body;
-
-  const newRecipe = { id: recipes.length + 1, food, ingredients };
-  recipes.push(newRecipe);
-  res.status(201).json(newRecipe);
-});
-
-app.delete('/api/:id', (req, res) => {
-  const recipeId = req.params.id;
-  const recipeIndex = recipes.findIndex(r => r.id === parseInt(recipeId));
-
-  if (recipeIndex === -1) {
-    return res.status(404).json({ error: 'Recipe not found' });
-  }
-
-  recipes.splice(recipeIndex, 1);
-  res.json({ message: 'Recipe deleted successfully' });
-});
-
-app.put('/api/:id', (req, res) => {
-  const recipeId = req.params.id;
-  const { food, ingredients } = req.bod
-  y;
-
-  const recipe = recipes.find(r => r.id === parseInt(recipeId));
-  if (!recipe) {
-    return res.status(404).json({ error: 'Recipe not found' });
-  }
-
-  recipe.food = food;
-  recipe.ingredients = ingredients;
-
-  res.json(recipe);
-});
-
-
-app.listen(port, () => {
-console.log(`Example app listening on port ${port}`)
-})
